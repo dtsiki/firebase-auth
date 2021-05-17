@@ -1,0 +1,17 @@
+@import '../../../styles/base/colors';
+@import '../../../styles/base/variables';
+
+.button {
+  padding: 15px 20px;
+  min-width: 150px;
+  color: $color--white;
+  background-color: $color--violet;
+  border: 0;
+  border-radius: $border-radius;
+  cursor: pointer;
+
+  &:hover,
+  &:focus {
+    background-color: $color--violet-darker;
+  }
+}
