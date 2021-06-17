@@ -37,7 +37,7 @@ const Input = ({
         id={id}
         placeholder={placeholder}
         value={value}
-        onChange={onChange}
+        onChange={(name, value) => onChange(name, value)}
       />
     </div>
   );
