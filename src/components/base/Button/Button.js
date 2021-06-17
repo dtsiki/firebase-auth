@@ -3,9 +3,9 @@ import React from 'react';
 
 import './style.scss';
 
-const Button = ({ children, onClick }) => {
+const Button = ({ children, onClick, type = 'submit', variant = 'primary' }) => {
   return (
-    <button onClick={onClick} className="button">
+    <button onClick={onClick} type={type} className={`button button--${variant}`}>
       {children}
     </button>
   );
@@ -14,6 +14,8 @@ const Button = ({ children, onClick }) => {
 Button.propTypes = {
   children: PropTypes.node,
   onClick: PropTypes.func,
+  type: PropTypes.string,
+  variant: PropTypes.string,
 };
 
 export default Button;
