@@ -3,7 +3,7 @@ import { Route, Switch } from 'react-router-dom';
 import { useStoreon } from 'storeon/react';
 
 import Loader from './components/base/Loader';
-import { AdminRoute, PrivateRoute } from './components/base/Routes/';
+import { PrivateRoute, PublicRoute } from './components/base/Routes/';
 import Nav from './components/common/Nav';
 import Notifications from './components/common/Notifications';
 import Sidebar from './components/common/Sidebar';
@@ -51,6 +51,7 @@ const App = () => {
         displayName: currentUser.displayName,
         email: currentUser.email,
         isAdmin: isUserAdmin ? true : false,
+        userId: currentUser.uid,
       };
 
       dispatch('user/login', userInfo);
@@ -61,21 +62,19 @@ const App = () => {
     <Loader />
   ) : (
     <>
-      <div className="wrapper">
-        <Nav />
-        <div className="container">
-          <Sidebar />
-          <main className="content">
-            <Switch>
-              <PrivateRoute exact path="/" isLogin={user.isLogin} component={Main} />
-              <PrivateRoute path="/profile" isLogin={user.isLogin} component={Profile} />
-              <AdminRoute path="/admin" isLogin={user.isLogin} isAdmin={user.isAdmin} component={Admin} />
-              <Route path="/signin" component={SignIn} />
-              <Route path="/signup" component={SignUp} />
-              <Route path="*" component={Error} />
-            </Switch>
-          </main>
-        </div>
+      <Nav />
+      <div className="container">
+        <Sidebar />
+        <main className="content">
+          <Switch>
+            <PrivateRoute exact path="/" component={Main} />
+            <PrivateRoute path="/profile" component={Profile} />
+            <PrivateRoute path="/admin" component={Admin} isForbidden />
+            <PublicRoute path="/signin" component={SignIn} />
+            <PublicRoute path="/signup" component={SignUp} />
+            <PublicRoute path="*" component={Error} />
+          </Switch>
+        </main>
       </div>
       <Notifications />
     </>

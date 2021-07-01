@@ -1,13 +1,30 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Redirect, Route } from 'react-router-dom';
+import { useStoreon } from 'storeon/react';
 
-const PrivateRoute = ({ component: Component, isLogin, ...rest }) => {
+import Wrapper from './../../common/Wrapper';
+import Error from './../../pages/Error';
+
+const PrivateRoute = ({ component: Component, isForbidden, ...rest }) => {
+  const { user } = useStoreon('user');
+  const hasAccess = !isForbidden ? true : isForbidden && user.isAdmin;
+
   return (
     <Route
       {...rest}
       render={(props) => {
-        return isLogin ? <Component {...props} /> : <Redirect to="/signin" />;
+        return user.isLogin ? (
+          hasAccess ? (
+            <Wrapper>
+              <Component {...props} />
+            </Wrapper>
+          ) : (
+            <Error message="Access denied" />
+          )
+        ) : (
+          <Redirect to="/signin" />
+        );
       }}
     />
   );
@@ -15,7 +32,7 @@ const PrivateRoute = ({ component: Component, isLogin, ...rest }) => {
 
 PrivateRoute.propTypes = {
   component: PropTypes.any,
-  isLogin: PropTypes.bool,
+  isForbidden: PropTypes.bool,
 };
 
 export default PrivateRoute;
