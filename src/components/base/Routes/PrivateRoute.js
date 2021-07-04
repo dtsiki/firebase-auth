@@ -15,13 +15,7 @@ const PrivateRoute = ({ component: Component, isForbidden, ...rest }) => {
       {...rest}
       render={(props) => {
         return user.isLogin ? (
-          hasAccess ? (
-            <Wrapper>
-              <Component {...props} />
-            </Wrapper>
-          ) : (
-            <Error message="Access denied" />
-          )
+          <Wrapper>{hasAccess ? <Component {...props} /> : <Error message="Access denied" />}</Wrapper>
         ) : (
           <Redirect to="/signin" />
         );

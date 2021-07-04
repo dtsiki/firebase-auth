@@ -17,46 +17,29 @@ import { auth } from './config';
 import { getUserDoc } from './controllers/firebase/auth';
 
 const App = () => {
-  const { user, dispatch } = useStoreon('user');
+  const { dispatch } = useStoreon('user');
   const [isInitializing, setInitializing] = useState(true);
-  const [currentUser, setCurrentUser] = useState(null);
-
-  const onAuthStateChanged = (user) => {
-    setCurrentUser(user);
-
-    if (isInitializing) setInitializing(false);
-  };
 
   useEffect(() => {
-    const subscriber = auth.onAuthStateChanged(onAuthStateChanged);
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        const result = await getUserDoc(user.uid);
 
-    return subscriber;
-  }, []);
+        if (result) {
+          const userObj = {
+            isLogin: true,
+            displayName: user.displayName,
+            email: user.email,
+            isAdmin: result.isAdmin,
+            userId: user.uid,
+          };
 
-  useEffect(() => {
-    const checkUserRole = async (userId) => {
-      const result = await getUserDoc(userId);
-
-      if (result.isAdmin) {
-        return true;
+          dispatch('user/login', userObj);
+          setInitializing(false);
+        }
       }
-      return false;
-    };
-
-    if (currentUser) {
-      const isUserAdmin = checkUserRole(currentUser.uid);
-
-      const userInfo = {
-        isLogin: true,
-        displayName: currentUser.displayName,
-        email: currentUser.email,
-        isAdmin: isUserAdmin ? true : false,
-        userId: currentUser.uid,
-      };
-
-      dispatch('user/login', userInfo);
-    }
-  }, [currentUser]);
+    });
+  }, []);
 
   return isInitializing ? (
     <Loader />
