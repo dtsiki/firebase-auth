@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Route, Switch } from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Switch } from 'react-router-dom';
 import { useStoreon } from 'storeon/react';
 
 import Loader from './components/base/Loader';
@@ -41,6 +41,34 @@ const App = () => {
     });
   }, []);
 
+  const routes = [
+    { name: 'Main', path: '/', isPrivate: true, component: Main, isExact: true },
+    { name: 'Profile', path: '/profile', isPrivate: true, component: Profile },
+    { name: 'Sign In', path: '/signin', isPrivate: false, component: SignIn },
+    { name: 'Sign Up', path: '/signup', isPrivate: false, component: SignUp },
+    { name: 'Secret page', path: '/admin', isPrivate: true, isForbidden: true, component: Admin },
+    { name: '404', path: '*', isPrivate: false, component: Error },
+  ];
+
+  const renderRoutes = useMemo(() => {
+    return routes.map((route) => {
+      if (route.isPrivate) {
+        return (
+          <PrivateRoute
+            key={`${route.name}`}
+            exact={route.isExact}
+            path={route.path}
+            component={route.component}
+            isForbidden={route.isForbidden}
+          />
+        );
+      } else
+        return (
+          <PublicRoute key={`${route.name}`} exact={route.isExact} path={route.path} component={route.component} />
+        );
+    });
+  }, [routes]);
+
   return isInitializing ? (
     <Loader />
   ) : (
@@ -49,14 +77,7 @@ const App = () => {
       <div className="container">
         <Sidebar />
         <main className="content">
-          <Switch>
-            <PrivateRoute exact path="/" component={Main} />
-            <PrivateRoute path="/profile" component={Profile} />
-            <PrivateRoute path="/admin" component={Admin} isForbidden />
-            <PublicRoute path="/signin" component={SignIn} />
-            <PublicRoute path="/signup" component={SignUp} />
-            <PublicRoute path="*" component={Error} />
-          </Switch>
+          <Switch>{renderRoutes}</Switch>
         </main>
       </div>
       <Notifications />
